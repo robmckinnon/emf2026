@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMF Camp 2026 — Schedule Browser</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:          #0d0f0e;
+    --surface:     #161a18;
+    --surface-2:   #1e2421;
+    --border:      #2a312d;
+    --accent:      #00e887;
+    --accent-dim:  #00b865;
+    --accent-glow: rgba(0,232,135,0.12);
+    --text-1:      #e8ede9;
+    --text-2:      #adbfb2;
+    --text-3:      #728c78;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 400;
+    line-height: 1.75;
+    background: var(--bg);
+    color: var(--text-1);
+    min-height: 100vh;
+  }
+
+  /* Header */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: 40px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+  }
+
+  .header-inner {
+    max-width: 1100px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .header-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .header-sep {
+    color: var(--text-3);
+  }
+
+  .header-subtitle {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* Main content */
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 16px;
+  }
+
+  /* Filter section */
+  .filter-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 0 8px;
+  }
+
+  .section-label {
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding-top: 7px;
+    margin-bottom: 0;
+  }
+
+  #tag-cloud {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  #type-cloud {
+    flex: 1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+
+  #type-cloud .tag-pill {
+    min-width: 160px;
+    justify-content: space-between;
+  }
+
+  .tag-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-2);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+    user-select: none;
+  }
+
+  .tag-pill:hover {
+    background: var(--surface-2);
+    color: var(--text-1);
+  }
+
+  .tag-pill.active {
+    background: var(--accent-glow);
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .tag-pill .count {
+    color: var(--text-3);
+  }
+
+  .tag-pill.active .count {
+    color: var(--accent);
+  }
+
+  .tag-pill-all {
+    border-color: var(--border);
+  }
+
+  .tag-pill-all.has-selection {
+    border-color: var(--accent-dim);
+    color: var(--accent-dim);
+  }
+
+  /* Status bar */
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 5px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-2);
+  }
+
+  .status-text {
+    flex: 1;
+  }
+
+  .clear-btn {
+    background: none;
+    border: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-3);
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 3px;
+    transition: color 120ms ease, background 120ms ease;
+    letter-spacing: 0.04em;
+  }
+
+  .clear-btn:hover {
+    color: var(--accent);
+    background: var(--accent-glow);
+  }
+
+  /* Event list */
+  #event-list {
+    padding-bottom: 48px;
+  }
+
+  .event-article {
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 120ms ease;
+    position: relative;
+  }
+
+  .event-article::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: transparent;
+    transition: background 120ms ease;
+  }
+
+  .event-article:hover::before {
+    background: var(--accent);
+  }
+
+  .event-article:hover {
+    background: var(--surface-2);
+  }
+
+  .event-row {
+    display: grid;
+    grid-template-columns: 120px 1fr auto;
+    align-items: start;
+    gap: 12px;
+    padding: 10px 0 10px 12px;
+  }
+
+  .event-type-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding-top: 2px;
+    white-space: nowrap;
+  }
+
+  .event-type-badge.talk        { color: var(--text-2); }
+  .event-type-badge.workshop    { color: #6bcfff; }
+  .event-type-badge.performance { color: #ff9f4a; }
+  .event-type-badge.other       { color: var(--text-3); }
+
+  .event-main {
+    min-width: 0;
+  }
+
+  .event-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-1);
+    line-height: 1.3;
+    margin-bottom: 3px;
+    word-break: break-word;
+  }
+
+  .event-row-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+  }
+
+  .event-tag-slug {
+    font-size: 11px;
+    color: var(--text-3);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .event-tag-slug + .event-tag-slug::before {
+    content: '·';
+    margin-right: 4px;
+    color: var(--text-3);
+  }
+
+  .event-chevron {
+    font-size: 12px;
+    color: var(--text-3);
+    padding-top: 2px;
+    padding-right: 8px;
+    transition: color 120ms ease;
+    flex-shrink: 0;
+  }
+
+  .event-article:hover .event-chevron {
+    color: var(--accent);
+  }
+
+  /* Expand/collapse */
+  .details {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 240ms ease-out, opacity 180ms ease;
+  }
+
+  .event-article.expanded .details {
+    max-height: 600px;
+    opacity: 1;
+  }
+
+  .event-article.expanded .event-chevron::after {
+    content: '▾';
+  }
+
+  .event-chevron::after {
+    content: '▸';
+  }
+
+  .details-inner {
+    padding: 0 16px 16px 144px;
+    margin-left: 12px;
+    margin-bottom: 4px;
+  }
+
+  .details-description {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 15px;
+    color: var(--text-2);
+    line-height: 1.75;
+    margin-bottom: 12px;
+    white-space: pre-line;
+  }
+
+  .details-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--text-3);
+  }
+
+  .details-meta span strong {
+    color: var(--text-2);
+    font-weight: 400;
+  }
+
+  .details-link {
+    font-size: 12px;
+    color: var(--accent-dim);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+  }
+
+  .details-link:hover {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+
+  .details-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 10px;
+  }
+
+  .details-tag {
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 2px 6px;
+  }
+
+  /* Empty state */
+  .empty-state {
+    padding: 48px 0;
+    font-size: 14px;
+    color: var(--text-3);
+  }
+
+  .cursor-blink {
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+  }
+
+  .tag-pill.disabled {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  mark {
+    background: rgba(0, 232, 135, 0.10);
+    color: var(--text-2);
+    border-radius: 2px;
+    padding: 0 1px;
+    font-weight: 500;
+  }
+
+  .event-article:not(.expanded) mark {
+    background: none;
+    color: inherit;
+    font-weight: inherit;
+    padding: 0;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <span class="header-title">EMF Camp 2026</span>
+    <span class="header-sep">—</span>
+    <span class="header-subtitle">Schedule Browser</span>
+  </div>
+</header>
+
+<div class="container">
+  <div class="filter-section" id="type-filter-section">
+    <div class="section-label">Filter by type</div>
+    <div id="type-cloud"></div>
+  </div>
+
+  <section class="filter-section">
+    <div class="section-label">Filter by Topic</div>
+    <div id="tag-cloud"></div>
+  </section>
+
+  <div class="status-bar">
+    <span class="status-text" id="status-text"></span>
+    <button class="clear-btn" id="clear-btn" style="display:none">[ × clear all ]</button>
+  </div>
+
+  <div id="event-list"></div>
+</div>
+
+<script>
+let SCHEDULE_DATA = [];
+
+const TAG_MAPPING = {
+    "3d-printing": ["3d printing","3d print","3d printed","3d-printed","3d printer"],
+    "accessibility": ["accessibility","mobility scooter","disability","me/cfs","assistive","deaf","tactile paving","partially sighted","visually impaired","blind","inclusive design"],
+    "animals": ["mouse","cat","hedgehog","pigeon","songbird","bird feeder","beekeeping","beekeeper","hive","bees"],
+    "animation": ["stop-motion","stop motion","claymation","aardman","animator","animating","puppet","puppetry"],
+    "art": ["moulding","harmonograph","weird art","art installation","installation","design language","radio art"],
+    "av": ["video","audio","sdi","ptz","av-over-ip","timecode","midi","osc"],
+    "badge": ["tildagon","badge","hexpansion","spaceagon"],
+    "camera-photography": ["camera","slit-scan","ccd","photograph","photography","lightning"],
+    "comedy": ["robin ince","comedy","stand-up","stand up","comedian","comedic","funny","humour","humor","sketch","satire","comic"],
+    "crafts": ["candle","candles","beeswax","spork","sheet metal","sheet-metal","leather","leatherwork","lace","lacemaking","bobbin lace","knot","knots","knotting","clay","moulding","bookbinding","origami","whittling","woodwork","craft","crafting"],
+    "culture": ["tarot","occult","mythology","folklore","tradition","ritual","witchcraft","astrology","divination"],
+    "cybersecurity": ["identity fraud","identity verification","north korean","dprk","remote work fraud","cyber security","cybersecurity","infosec","phishing","malware","exploit","vulnerability","penetration testing","pen test","ctf","capture the flag","random number generator","rng","randomness failure","cryptographic"],
+    "diy": ["diy","garage","off-the-shelf","hand tools","built in a shed","home-made","homemade","build your own","right to repair","disposable technology","maintenance","repairability"],
+    "electronics": ["electronic","electronics","electrotech","arduino","soldering","wiring","24v","12v","microcontroller","inductive charging"],
+    "energy": ["solar","heat pump","heatpump","battery","batteries","induction hob","insulation","thermal solar"],
+    "ev": ["electric vehicle","electric vehicles","ev charging"],
+    "fashion": ["fashion","couture","bespoke","wardrobe","costume","clothing"],
+    "film": ["film","movie","star wars","marvel","james bond","skyfall","mission impossible","kubrick","space odyssey","cinema","cinematic","documentary","screenplay","director"],
+    "food": ["coffee","barista","brewing","tasting","food","cooking","recipe","fermentation","sourdough","honey","baking"],
+    "fpga": ["fpga"],
+    "gaming": ["board game","board games","tabletop","card game","card games","dice","roleplaying","rpg","d&d","dungeons","video game","video games","game design","game jam","magic the gathering","trading card game","tcg","ttrpg","arcade","arcades","arcade machine","polygen"],
+    "gender-equality": ["women","women's work","for girls","gender"],
+    "hacking": ["hack","hacking","hacked","jailbreak","reverse engineering","exploit","breaking","cracking"],
+    "home-automation": ["home assistant","automate","automation","energy monitor","smart home","smart nursery"],
+    "home": ["boiler","boilers","plumbing","heating","house","home assistant","shower","domestic"],
+    "horror": ["horror","spooky","scare","cursed","terrifying","frightening"],
+    "interactive": ["interactive","interaction"],
+    "law": ["defamation","libel","slander","legal","court","lawsuit","judicial","high court","gdpr","copyright","intellectual property","regulation","legislation"],
+    "lighting": ["lighting","dmx","sacn","art-net","leds","stage lights"],
+    "marine": ["marine","underwater","sea scooter","hull","waterproof","water pressure"],
+    "mathematics": ["maths","math","mathematics","algebra","calculus","statistics","spreadsheet","excel","numerical","harmonic","harmonograph","data visualisation","data visualization","visualisation","visualization"],
+    "mechanical": ["plumbing","mechanical","magnetic gear","gear drive","gears","contraption","mechanism","levitation","harmonograph","double pendulum","pendulum machine","automata","clockwork","clothes peg"],
+    "medical": ["mri","medical","medical imaging","emergency medicine","surgery","cpr","defibrillator","aed","first aid","resuscitation","tms","transcranial","brain stimulation"],
+    "microscopy": ["microscope","microscopy","scanning tunnelling","stm"],
+    "music": ["music","music box","concert","tour","singer","musical artist","toccata","synth","synths","chiptune","chip tune","demoscene","ambient","hip-hop","disco","dj","band","album"],
+    "nature": ["horticulture","horticultural","tree grafting","grafting","nursery","gardening","garden","botany","plant","plants","foraging","ecology","rewilding"],
+    "networking": ["network","networking","aes67","audio-over-ip","video-over-ip"],
+    "open-source": ["open hardware","open-hardware","open source","open-source"],
+    "pcb": ["pcb","pcbs","circuit board","flexible pcb","schematic","kicad"],
+    "performance": ["karaoke","dj set","live performance","spoken word","slam poetry","improv"],
+    "physics": ["physics","quantum","quantum tunnelling","quantum interference","nanoscale","atomic scale","molecular electronics","microwave","waveguide","wave guide","doppler","ghz","mhz"],
+    "props": ["prop","props","prop maker","prop making"],
+    "robotics": ["robot","robots","robotics","animatronic","animatronics","droid","droids"],
+    "safety": ["safety","fatality","fault tolerance","fault-tolerance","fire","watts of power","radioactive","radiological","nuclear","orphan source","radiation"],
+    "science": ["scientific","topology","geometry","electromagnetism","electromagnetic","neuroscience","neurology","cognitive","brain stimulation","tms","transcranial","biology","chemistry","zoology","pendulum","radioactive","radiological","nuclear","radiation"],
+    "sensors": ["sensor","sensors","mems","imu","inertial measurement","air quality"],
+    "social": ["opening ceremony","closing ceremony","infrastructure review","community","unconference","bof","birds of a feather"],
+    "sound": ["low-frequency","structure-borne sound","sonaforms","acoustics","acoustic","vibration","resonance","sonar"],
+    "space": ["apollo","space","satellite","satellites","orbit","orbital","astronaut","astronauts","lora from space","cosmic","cosmos","galaxy","galaxies","big bang","universe","telescope","astrophysics","astronomy"],
+    "sustainability": ["fossil fuel","fossil fuels","low carbon","clean living","greener","carbon"],
+    "textiles": ["sewing","pattern cutting","patterning","garment","garments","tailoring","draping","fabric","textile","textiles","knit","knitting","embroidery","darning","mending","stitching","stitches","needlework"],
+    "theatre-live-events": ["theatre","theater","stage","live events","west end","rigging","pyrotechnic","pyrotechnics","show control"],
+    "transport": ["railway","signalling","signal box","train","trains","rail","locomotive","tram","bus network","infrastructure review"],
+    "vehicles": ["scooter","vehicle","vehicles","camper van","steam wagon"],
+    "wearables": ["wearable","wearables","video jacket","video screen","body-worn","blinky"],
+    "web": ["html","css","website","web page","webpage","javascript","http","web design","web development","frontend","front-end"],
+};
+
+// --- State ---
+let selectedTypes = new Set();
+let selectedTags = new Set();
+let expandedIds = new Set();
+
+// --- Tag matching ---
+function escapeKeyword(kw) {
+  return kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function tagEvent(event, tagMapping) {
+  const text = (event.title + ' ' + event.description).toLowerCase();
+  const matched = [];
+  for (const [tag, keywords] of Object.entries(tagMapping)) {
+    for (const kw of keywords) {
+      const hit = kw.includes(' ')
+        ? text.includes(kw)
+        : new RegExp('\\b' + escapeKeyword(kw) + '\\b').test(text);
+      if (hit) { matched.push(tag); break; }
+    }
+  }
+  return matched.length ? matched : ['untagged'];
+}
+
+// --- Build indexes ---
+function buildTagIndex(events, tagMapping) {
+  const index = new Map();
+  for (const event of events) {
+    index.set(event.id, tagEvent(event, tagMapping));
+  }
+  return index;
+}
+
+function buildTagCounts(tagIndex) {
+  const counts = new Map();
+  for (const tags of tagIndex.values()) {
+    for (const tag of tags) {
+      counts.set(tag, (counts.get(tag) || 0) + 1);
+    }
+  }
+  return counts;
+}
+
+// --- Filtering helper ---
+function eventMatchesFilters(event, tagIndex, selectedTypes, selectedTags) {
+  if (selectedTypes.size > 0 && !selectedTypes.has(event.type)) return false;
+  if (selectedTags.size > 0) {
+    const tags = tagIndex.get(event.id) || [];
+    if (![...selectedTags].every(t => tags.includes(t))) return false;
+  }
+  return true;
+}
+
+function computeDynamicCounts(events, tagIndex, selectedTypes, selectedTags) {
+  if (selectedTypes.size === 0 && selectedTags.size === 0) return tagCounts;
+  const result = new Map();
+  for (const tag of tagCounts.keys()) {
+    if (selectedTags.has(tag)) {
+      // Active tag: count events matching current full filter
+      result.set(tag, events.filter(e => eventMatchesFilters(e, tagIndex, selectedTypes, selectedTags)).length);
+    } else {
+      // Unselected tag: count events that would match if this tag were added
+      const hypotheticalTags = new Set([...selectedTags, tag]);
+      result.set(tag, events.filter(e => eventMatchesFilters(e, tagIndex, selectedTypes, hypotheticalTags)).length);
+    }
+  }
+  return result;
+}
+
+function buildTypeCounts(events) {
+  const counts = new Map();
+  for (const event of events) {
+    const t = event.type;
+    counts.set(t, (counts.get(t) || 0) + 1);
+  }
+  return counts;
+}
+
+function computeTypeCounts(events, tagIndex, selectedTypes, selectedTags) {
+  const counts = new Map();
+  const allTypes = [...new Set(events.map(e => e.type))];
+  for (const type of allTypes) {
+    if (selectedTypes.has(type)) {
+      // Active: show count of events matching current full filter
+      counts.set(type, events.filter(e => eventMatchesFilters(e, tagIndex, selectedTypes, selectedTags)).length);
+    } else if (selectedTypes.size > 0) {
+      // Another type selected — types are mutually exclusive, intersection = 0
+      counts.set(type, 0);
+    } else {
+      // No type selected: show count for just this type with current tag filter
+      const hypotheticalTypes = new Set([type]);
+      counts.set(type, events.filter(e => eventMatchesFilters(e, tagIndex, hypotheticalTypes, selectedTags)).length);
+    }
+  }
+  return counts;
+}
+
+function typeDisplayName(type) {
+  if (!type) return 'OTHER';
+  const t = type.toLowerCase();
+  if (t === 'talk') return 'TALK';
+  if (t === 'workshop') return 'WORKSHOP';
+  if (t === 'performance') return 'PERFORMANCE';
+  return type.toUpperCase();
+}
+
+function typeColor(type) {
+  if (!type) return 'var(--text-3)';
+  const t = type.toLowerCase();
+  if (t === 'talk') return 'var(--text-2)';
+  if (t === 'workshop') return '#6bcfff';
+  if (t === 'performance') return '#ff9f4a';
+  return 'var(--text-3)';
+}
+
+function renderTypeCloud(events, tagIndex, selectedTypes, selectedTags) {
+  const cloud = document.getElementById('type-cloud');
+  cloud.innerHTML = '';
+
+  const dynCounts = computeTypeCounts(events, tagIndex, selectedTypes, selectedTags);
+  const TYPE_ORDER = ['performance', 'talk', 'workshop'];
+  const allTypes = [...new Set(events.map(e => e.type))].sort((a, b) => {
+    const ai = TYPE_ORDER.indexOf(a);
+    const bi = TYPE_ORDER.indexOf(b);
+    if (ai === -1 && bi === -1) return a.localeCompare(b);
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+
+  for (const type of allTypes) {
+    const count = dynCounts.get(type) ?? 0;
+    const isActive = selectedTypes.has(type);
+    const isDisabled = !isActive && count === 0;
+
+    const btn = document.createElement('button');
+    btn.className = 'tag-pill' + (isActive ? ' active' : '') + (isDisabled ? ' disabled' : '');
+    btn.dataset.type = type;
+    if (isActive) {
+      btn.style.color = typeColor(type);
+      btn.style.borderColor = typeColor(type);
+    } else {
+      btn.style.color = typeColor(type);
+    }
+
+    const labelSpan = document.createElement('span');
+    labelSpan.textContent = typeDisplayName(type);
+
+    const countSpan = document.createElement('span');
+    countSpan.className = 'count';
+    countSpan.textContent = '(' + count + ')';
+    if (isActive) countSpan.style.color = typeColor(type);
+
+    btn.appendChild(labelSpan);
+    btn.appendChild(countSpan);
+    btn.addEventListener('click', () => handleTypeClick(type));
+    cloud.appendChild(btn);
+  }
+}
+
+function handleTypeClick(typeName) {
+  if (selectedTypes.has(typeName)) selectedTypes.delete(typeName);
+  else selectedTypes.add(typeName);
+  renderTypeCloud(SCHEDULE_DATA, tagIndex, selectedTypes, selectedTags);
+  renderTagCloud(tagCounts, selectedTags);
+  renderEventList(SCHEDULE_DATA, tagIndex, selectedTypes, selectedTags);
+  updateStatusBar();
+}
+
+// --- Rendering ---
+function renderTagCloud(tagCounts, selectedTags) {
+  const cloud = document.getElementById('tag-cloud');
+  cloud.innerHTML = '';
+
+  // "All" button
+  const allBtn = document.createElement('button');
+  allBtn.className = 'tag-pill tag-pill-all' + (selectedTags.size > 0 ? ' has-selection' : '');
+  allBtn.textContent = 'ALL';
+  allBtn.addEventListener('click', () => {
+    selectedTags.clear();
+    renderTagCloud(tagCounts, selectedTags);
+    renderEventList(SCHEDULE_DATA, tagIndex, selectedTypes, selectedTags);
+    updateStatusBar();
+  });
+  cloud.appendChild(allBtn);
+
+  const dynamicCounts = computeDynamicCounts(SCHEDULE_DATA, tagIndex, selectedTypes, selectedTags);
+
+  // Sort: active first, then by dynamic count desc
+  const sorted = [...tagCounts.entries()].sort((a, b) => {
+    const aActive = selectedTags.has(a[0]) ? 1 : 0;
+    const bActive = selectedTags.has(b[0]) ? 1 : 0;
+    if (aActive !== bActive) return bActive - aActive;
+    const aDyn = dynamicCounts.get(a[0]) ?? 0;
+    const bDyn = dynamicCounts.get(b[0]) ?? 0;
+    return bDyn - aDyn;
+  });
+
+  for (const [tag, _staticCount] of sorted) {
+    const dynCount = dynamicCounts.get(tag) ?? 0;
+    const isActive = selectedTags.has(tag);
+    const isDisabled = !isActive && dynCount === 0;
+
+    const btn = document.createElement('button');
+    btn.className = 'tag-pill' + (isActive ? ' active' : '') + (isDisabled ? ' disabled' : '');
+    btn.dataset.tag = tag;
+
+    const labelSpan = document.createElement('span');
+    labelSpan.textContent = tag;
+
+    const countSpan = document.createElement('span');
+    countSpan.className = 'count';
+    countSpan.textContent = '(' + dynCount + ')';
+
+    btn.appendChild(labelSpan);
+    btn.appendChild(countSpan);
+    btn.addEventListener('click', () => handleTagClick(tag));
+    cloud.appendChild(btn);
+  }
+}
+
+function formatType(type) {
+  if (!type) return 'OTHER';
+  return type.toUpperCase();
+}
+
+function typeClass(type) {
+  if (!type) return 'other';
+  const t = type.toLowerCase();
+  if (t === 'talk') return 'talk';
+  if (t === 'workshop') return 'workshop';
+  if (t === 'performance') return 'performance';
+  return 'other';
+}
+
+function renderEventList(events, tagIndex, selectedTypes, selectedTags) {
+  const list = document.getElementById('event-list');
+  list.innerHTML = '';
+
+  const filtered = (selectedTypes.size === 0 && selectedTags.size === 0)
+    ? events
+    : events.filter(e => eventMatchesFilters(e, tagIndex, selectedTypes, selectedTags));
+
+  if (selectedTypes.size > 0 || selectedTags.size > 0) {
+    filtered.sort((a, b) => a.title.localeCompare(b.title));
+  }
+
+  if (filtered.length === 0) {
+    const tagList = [...selectedTags].join(', ');
+    list.innerHTML = `<div class="empty-state">&gt; no results for [${tagList}]<span class="cursor-blink">_</span></div>`;
+    return filtered.length;
+  }
+
+  for (const event of filtered) {
+    const tags = tagIndex.get(event.id) || ['untagged'];
+    const isExpanded = expandedIds.has(event.id);
+
+    const article = document.createElement('article');
+    article.className = 'event-article' + (isExpanded ? ' expanded' : '');
+    article.dataset.id = event.id;
+
+    // Row
+    const row = document.createElement('div');
+    row.className = 'event-row';
+
+    const badge = document.createElement('div');
+    badge.className = 'event-type-badge ' + typeClass(event.type);
+    badge.textContent = formatType(event.type);
+
+    const main = document.createElement('div');
+    main.className = 'event-main';
+
+    const title = document.createElement('div');
+    title.className = 'event-title';
+
+    // Compute highlight keywords once for both title and description
+    const highlightKws = [];
+    if (selectedTags.size > 0) {
+      for (const tag of selectedTags) {
+        const kws = TAG_MAPPING[tag];
+        if (kws) highlightKws.push(...kws);
+      }
+    }
+
+    if (highlightKws.length) {
+      title.innerHTML = highlightKeywords(event.title || '', highlightKws);
+    } else {
+      title.textContent = event.title;
+    }
+
+    const rowTags = document.createElement('div');
+    rowTags.className = 'event-row-tags';
+    const displayTags = tags.slice(0, 5);
+    for (const tag of displayTags) {
+      const slug = document.createElement('span');
+      slug.className = 'event-tag-slug';
+      slug.textContent = tag;
+      rowTags.appendChild(slug);
+    }
+
+    main.appendChild(title);
+    main.appendChild(rowTags);
+
+    const chevron = document.createElement('div');
+    chevron.className = 'event-chevron';
+
+    row.appendChild(badge);
+    row.appendChild(main);
+    row.appendChild(chevron);
+
+    // Details
+    const details = document.createElement('div');
+    details.className = 'details';
+
+    const inner = document.createElement('div');
+    inner.className = 'details-inner';
+
+    const desc = document.createElement('div');
+    desc.className = 'details-description';
+    if (highlightKws.length) {
+      desc.innerHTML = highlightKeywords(normalizeDescription(event.description), highlightKws);
+    } else {
+      desc.textContent = normalizeDescription(event.description);
+    }
+
+    const meta = document.createElement('div');
+    meta.className = 'details-meta';
+
+    if (event.names) {
+      const sp = document.createElement('span');
+      sp.innerHTML = '<strong>' + escapeHTML(event.names) + '</strong>'
+        + (event.pronouns ? ' <span style="color:var(--text-3)">(' + escapeHTML(event.pronouns) + ')</span>' : '');
+      meta.appendChild(sp);
+    }
+
+    inner.appendChild(desc);
+    if (meta.children.length) inner.appendChild(meta);
+
+    if (event.link) {
+      const linkEl = document.createElement('a');
+      linkEl.className = 'details-link';
+      linkEl.href = event.link;
+      linkEl.target = '_blank';
+      linkEl.rel = 'noopener noreferrer';
+      linkEl.textContent = '→ ' + event.link;
+      inner.appendChild(linkEl);
+    }
+
+    if (tags.length) {
+      const detailTags = document.createElement('div');
+      detailTags.className = 'details-tags';
+      for (const tag of tags) {
+        const t = document.createElement('span');
+        t.className = 'details-tag';
+        t.textContent = tag;
+        detailTags.appendChild(t);
+      }
+      inner.appendChild(detailTags);
+    }
+
+    details.appendChild(inner);
+    article.appendChild(row);
+    article.appendChild(details);
+
+    article.addEventListener('click', () => handleEventClick(event.id));
+
+    list.appendChild(article);
+  }
+
+  return filtered.length;
+}
+
+function normalizeDescription(text) {
+  return (text || '')
+    .replace(/\r\n/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+}
+
+function escapeHTML(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function highlightKeywords(text, keywords) {
+  if (!keywords.length) return escapeHTML(text);
+
+  // Sort longest-first to avoid shorter keywords masking longer ones
+  const sorted = [...keywords].sort((a, b) => b.length - a.length);
+
+  // Find all match ranges
+  const ranges = [];
+  for (const kw of sorted) {
+    const escapedKw = escapeKeyword(kw);
+    const pattern = kw.includes(' ')
+      ? new RegExp(escapedKw, 'gi')
+      : new RegExp('\\b' + escapedKw + '\\b', 'gi');
+    let m;
+    while ((m = pattern.exec(text)) !== null) {
+      ranges.push({ start: m.index, end: m.index + m[0].length });
+    }
+  }
+
+  if (!ranges.length) return escapeHTML(text);
+
+  // Merge overlapping ranges
+  ranges.sort((a, b) => a.start - b.start);
+  const merged = [ranges[0]];
+  for (let i = 1; i < ranges.length; i++) {
+    const last = merged[merged.length - 1];
+    if (ranges[i].start <= last.end) {
+      last.end = Math.max(last.end, ranges[i].end);
+    } else {
+      merged.push(ranges[i]);
+    }
+  }
+
+  // Build output
+  let result = '';
+  let pos = 0;
+  for (const { start, end } of merged) {
+    result += escapeHTML(text.slice(pos, start));
+    result += '<mark>' + escapeHTML(text.slice(start, end)) + '</mark>';
+    pos = end;
+  }
+  result += escapeHTML(text.slice(pos));
+  return result;
+}
+
+function updateStatusBar() {
+  const total = SCHEDULE_DATA.length;
+  const filtered = (selectedTypes.size === 0 && selectedTags.size === 0)
+    ? total
+    : SCHEDULE_DATA.filter(e => eventMatchesFilters(e, tagIndex, selectedTypes, selectedTags)).length;
+
+  const statusText = document.getElementById('status-text');
+  const clearBtn = document.getElementById('clear-btn');
+
+  statusText.textContent = 'Showing ' + filtered + ' of ' + total + ' events';
+  clearBtn.style.display = (selectedTypes.size > 0 || selectedTags.size > 0) ? 'inline' : 'none';
+}
+
+// --- Event handlers ---
+function handleTagClick(tagName) {
+  if (selectedTags.has(tagName)) {
+    selectedTags.delete(tagName);
+  } else {
+    selectedTags.add(tagName);
+  }
+  renderTypeCloud(SCHEDULE_DATA, tagIndex, selectedTypes, selectedTags);
+  renderTagCloud(tagCounts, selectedTags);
+  renderEventList(SCHEDULE_DATA, tagIndex, selectedTypes, selectedTags);
+  updateStatusBar();
+}
+
+function handleEventClick(id) {
+  const article = document.querySelector('[data-id="' + id + '"]');
+  if (!article) return;
+  if (expandedIds.has(id)) {
+    expandedIds.delete(id);
+    article.classList.remove('expanded');
+  } else {
+    expandedIds.add(id);
+    article.classList.add('expanded');
+  }
+}
+
+// --- Clear button ---
+document.getElementById('clear-btn').addEventListener('click', () => {
+  selectedTypes.clear();
+  selectedTags.clear();
+  renderTypeCloud(SCHEDULE_DATA, tagIndex, selectedTypes, selectedTags);
+  renderTagCloud(tagCounts, selectedTags);
+  renderEventList(SCHEDULE_DATA, tagIndex, selectedTypes, selectedTags);
+  updateStatusBar();
+});
+
+// --- Init ---
+let tagIndex = new Map();
+let tagCounts = new Map();
+
+document.getElementById('event-list').innerHTML = '<p style="color:var(--text-3);padding:24px 0">loading schedule…</p>';
+
+fetch('https://www.emfcamp.org/schedule/2026.json')
+  .then(r => r.json())
+  .then(data => {
+    SCHEDULE_DATA = data;
+    tagIndex = buildTagIndex(SCHEDULE_DATA, TAG_MAPPING);
+    tagCounts = buildTagCounts(tagIndex);
+    renderTypeCloud(SCHEDULE_DATA, tagIndex, selectedTypes, selectedTags);
+    renderTagCloud(tagCounts, selectedTags);
+    renderEventList(SCHEDULE_DATA, tagIndex, selectedTypes, selectedTags);
+    updateStatusBar();
+  })
+  .catch(() => {
+    document.getElementById('event-list').innerHTML = '<p style="color:var(--text-3);padding:24px 0">> failed to load schedule_</p>';
+  });
+</script>
+</body>
+</html>
