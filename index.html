@@ -867,12 +867,12 @@ function renderEventList(events, tagIndex, selectedTypes, selectedTags) {
   list.innerHTML = '';
 
   const filtered = (selectedTypes.size === 0 && selectedTags.size === 0)
-    ? events
+    ? [...events]
     : events.filter(e => eventMatchesFilters(e, tagIndex, selectedTypes, selectedTags));
 
-  if (selectedTypes.size > 0 || selectedTags.size > 0) {
-    filtered.sort((a, b) => a.title.localeCompare(b.title));
-  }
+  filtered.sort((a, b) =>
+    stripEmoji(a.title).localeCompare(stripEmoji(b.title))
+  );
 
   if (filtered.length === 0) {
     const tagList = [...selectedTags].join(', ');
@@ -1003,6 +1003,13 @@ function renderEventList(events, tagIndex, selectedTypes, selectedTags) {
   }
 
   return filtered.length;
+}
+
+function stripEmoji(str) {
+  return str
+    .replace(/[\p{Emoji_Presentation}\p{Extended_Pictographic}]/gu, '')
+    .replace(/^["\s]+/, '')
+    .trim();
 }
 
 function normalizeDescription(text) {
