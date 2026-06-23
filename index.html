@@ -313,6 +313,19 @@
     word-break: break-word;
   }
 
+  .event-short-desc {
+    font-size: 12px;
+    color: var(--text-2);
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60ch;
+  }
+
+  .event-article.expanded .event-short-desc { display: none; }
+  .event-article:not(.expanded) .event-row-tags { display: none; }
+
   .event-row-tags {
     display: flex;
     flex-wrap: wrap;
@@ -927,13 +940,17 @@ function renderEventList(events, tagIndex, selectedTypes, selectedTags) {
       rowTags.appendChild(slug);
     }
 
+    const shortDesc = document.createElement('div');
+    shortDesc.className = 'event-short-desc';
+    shortDesc.textContent = event.short_description || '';
+
     main.appendChild(title);
+    main.appendChild(shortDesc);
     main.appendChild(rowTags);
 
     const speaker = document.createElement('div');
     speaker.className = 'event-speaker';
-    const speakerNames = (event.speakers || event.by || []);
-    if (speakerNames.length) speaker.textContent = speakerNames.join(', ');
+    if (event.names) speaker.textContent = event.names;
 
     const chevron = document.createElement('div');
     chevron.className = 'event-chevron';
