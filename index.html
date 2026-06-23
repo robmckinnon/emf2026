@@ -6,21 +6,31 @@
 <title>EMF Camp 2026 — Schedule Browser</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --bg:          #0d0f0e;
-    --surface:     #161a18;
-    --surface-2:   #1e2421;
-    --border:      #2a312d;
-    --accent:      #00e887;
-    --accent-dim:  #00b865;
-    --accent-glow: rgba(0,232,135,0.12);
-    --text-1:      #e8ede9;
-    --text-2:      #adbfb2;
-    --text-3:      #728c78;
+    /* EMF 2026 official palette */
+    --emf-orange:     #F77F02;
+    --emf-coral:      #F5515E;
+    --emf-yellow:     #F9E200;
+    --emf-green:      #2AE28C;
+    --emf-light-blue: #2EADD9;
+    --emf-mid-blue:   #005D96;
+    --emf-dark-blue:  #000730;
+
+    /* Dark theme mappings */
+    --bg:          #000a1a;
+    --surface:     #001228;
+    --surface-2:   #001e3a;
+    --border:      #0a3060;
+    --accent:      #F77F02;
+    --accent-dim:  #c96300;
+    --accent-glow: rgba(247,127,2,0.15);
+    --text-1:      #e8edf5;
+    --text-2:      #8aa8cc;
+    --text-3:      #4a6fa0;
   }
 
   html { font-size: 16px; }
@@ -39,9 +49,11 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    height: 40px;
-    background: var(--bg);
-    border-bottom: 1px solid var(--border);
+    height: 48px;
+    background:
+      linear-gradient(rgba(0,7,48,0.88), rgba(0,7,48,0.88)),
+      url('https://www.emfcamp.org/static/images/main_images/004-21400868dbd3f9a5d4066374835203da.jpg') center/cover no-repeat;
+    border-bottom: 1px solid var(--emf-mid-blue);
     display: flex;
     align-items: center;
   }
@@ -56,13 +68,19 @@
     gap: 12px;
   }
 
+  .header-logo {
+    height: 26px;
+    width: auto;
+    flex-shrink: 0;
+    display: block;
+  }
+
   .header-title {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 13px;
+    font-family: 'Raleway', 'Inter', system-ui, sans-serif;
+    font-size: 15px;
     font-weight: 600;
-    color: var(--accent);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    color: var(--emf-orange);
+    letter-spacing: 0.04em;
   }
 
   .header-sep {
@@ -71,8 +89,8 @@
 
   .header-subtitle {
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 12px;
-    color: var(--text-3);
+    font-size: 11px;
+    color: var(--text-2);
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }
@@ -234,7 +252,15 @@
   }
 
   .event-article:hover {
-    background: var(--surface-2);
+    background: #002040;
+  }
+
+  .event-article:hover .event-title {
+    color: #ffffff;
+  }
+
+  .event-article:hover .details-description {
+    color: var(--text-1);
   }
 
   .event-row {
@@ -255,9 +281,9 @@
     white-space: nowrap;
   }
 
-  .event-type-badge.talk        { color: var(--text-2); }
-  .event-type-badge.workshop    { color: #6bcfff; }
-  .event-type-badge.performance { color: #ff9f4a; }
+  .event-type-badge.talk        { color: var(--emf-light-blue); }
+  .event-type-badge.workshop    { color: var(--emf-green); }
+  .event-type-badge.performance { color: var(--emf-coral); }
   .event-type-badge.other       { color: var(--text-3); }
 
   .event-main {
@@ -466,7 +492,7 @@
     }
 
     #type-cloud { width: 100%; }
-    #type-cloud .tag-pill { min-width: 0; flex: 1; justify-content: center; }
+    #type-cloud .tag-pill { min-width: 0; flex: none; justify-content: flex-start; }
 
     .tag-pill { padding: 8px 10px; font-size: 11px; min-height: 36px; }
 
@@ -493,7 +519,7 @@
 
 <header>
   <div class="header-inner">
-    <span class="header-title">EMF Camp 2026</span>
+    <img class="header-logo" src="https://www.emfcamp.org/static/images/brand/2026/emf2026-logo-white-gradient.svg" alt="EMF 2026 logo">
     <span class="header-sep">—</span>
     <span class="header-subtitle">Schedule Browser</span>
   </div>
