@@ -265,10 +265,22 @@
 
   .event-row {
     display: grid;
-    grid-template-columns: 120px 1fr auto;
+    grid-template-columns: 120px 1fr auto auto;
     align-items: start;
     gap: 12px;
     padding: 10px 0 10px 12px;
+  }
+
+  .event-speaker {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-3);
+    padding-top: 3px;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
   }
 
   .event-type-badge {
@@ -284,6 +296,8 @@
   .event-type-badge.talk        { color: var(--emf-light-blue); }
   .event-type-badge.workshop    { color: var(--emf-green); }
   .event-type-badge.performance { color: var(--emf-coral); }
+  .event-type-badge.film        { color: var(--emf-yellow); }
+  .event-type-badge.music       { color: #b57bee; }
   .event-type-badge.other       { color: var(--text-3); }
 
   .event-main {
@@ -434,7 +448,7 @@
   }
 
   mark {
-    background: rgba(0, 232, 135, 0.10);
+    background: rgba(247, 127, 2, 0.15);
     color: var(--text-2);
     border-radius: 2px;
     padding: 0 1px;
@@ -450,7 +464,7 @@
 
   /* Tablet: 600–899px */
   @media (min-width: 600px) and (max-width: 899px) {
-    .event-row { grid-template-columns: 100px 1fr auto; }
+    .event-row { grid-template-columns: 100px 1fr auto auto; }
     .details-inner { padding: 0 12px 14px 120px; margin-left: 0; }
   }
 
@@ -505,6 +519,7 @@
     }
     .event-type-badge { grid-column: 1; grid-row: 1; font-size: 10px; }
     .event-main { grid-column: 1; grid-row: 2; }
+    .event-speaker { display: none; }
     .event-chevron { grid-column: 2; grid-row: 1 / span 2; align-self: center; padding-right: 4px; }
 
     .details-inner { padding: 0 8px 12px 8px; margin-left: 0; }
@@ -519,7 +534,8 @@
 
 <header>
   <div class="header-inner">
-    <img class="header-logo" src="https://www.emfcamp.org/static/images/brand/2026/emf2026-logo-white-gradient.svg" alt="EMF 2026 logo">
+    <img class="header-logo" src="https://www.emfcamp.org/static/images/brand/2026/emf2026-logo-white-gradient.svg" alt="EMF Camp 2026">
+    <span class="header-title">EMF 2026</span>
     <span class="header-sep">—</span>
     <span class="header-subtitle">Schedule Browser</span>
   </div>
@@ -715,9 +731,11 @@ function typeDisplayName(type) {
 function typeColor(type) {
   if (!type) return 'var(--text-3)';
   const t = type.toLowerCase();
-  if (t === 'talk') return 'var(--text-2)';
-  if (t === 'workshop') return '#6bcfff';
-  if (t === 'performance') return '#ff9f4a';
+  if (t === 'talk')        return 'var(--emf-light-blue)';
+  if (t === 'workshop')    return 'var(--emf-green)';
+  if (t === 'performance') return 'var(--emf-coral)';
+  if (t === 'film')        return 'var(--emf-yellow)';
+  if (t === 'music')       return '#b57bee';
   return 'var(--text-3)';
 }
 
@@ -836,9 +854,11 @@ function formatType(type) {
 function typeClass(type) {
   if (!type) return 'other';
   const t = type.toLowerCase();
-  if (t === 'talk') return 'talk';
-  if (t === 'workshop') return 'workshop';
+  if (t === 'talk')        return 'talk';
+  if (t === 'workshop')    return 'workshop';
   if (t === 'performance') return 'performance';
+  if (t === 'film')        return 'film';
+  if (t === 'music')       return 'music';
   return 'other';
 }
 
@@ -910,11 +930,17 @@ function renderEventList(events, tagIndex, selectedTypes, selectedTags) {
     main.appendChild(title);
     main.appendChild(rowTags);
 
+    const speaker = document.createElement('div');
+    speaker.className = 'event-speaker';
+    const speakerNames = (event.speakers || event.by || []);
+    if (speakerNames.length) speaker.textContent = speakerNames.join(', ');
+
     const chevron = document.createElement('div');
     chevron.className = 'event-chevron';
 
     row.appendChild(badge);
     row.appendChild(main);
+    row.appendChild(speaker);
     row.appendChild(chevron);
 
     // Details
