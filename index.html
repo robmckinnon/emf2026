@@ -374,15 +374,11 @@
 
   /* Expand/collapse */
   .details {
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: max-height 240ms ease-out, opacity 180ms ease;
+    display: none;
   }
 
   .event-article.expanded .details {
-    max-height: 600px;
-    opacity: 1;
+    display: block;
   }
 
   .event-article.expanded .event-chevron::after {
@@ -645,7 +641,7 @@
       content: '▸';
     }
     .filter-section-body {
-      max-height: 600px;
+      max-height: none;
       overflow: hidden;
       transition: max-height 240ms ease-out;
       padding-bottom: 6px;
