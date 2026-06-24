@@ -265,7 +265,7 @@
 
   .event-row {
     display: grid;
-    grid-template-columns: 120px 1fr auto auto auto;
+    grid-template-columns: 120px auto 1fr auto auto;
     align-items: start;
     gap: 12px;
     padding: 10px 0 10px 12px;
@@ -601,7 +601,7 @@
 
   /* Tablet: 600–899px */
   @media (min-width: 600px) and (max-width: 899px) {
-    .event-row { grid-template-columns: 100px 1fr auto auto auto; }
+    .event-row { grid-template-columns: 100px auto 1fr auto auto; }
     .details-inner { padding: 0 12px 14px 120px; margin-left: 0; }
   }
 
@@ -657,8 +657,8 @@
     .event-type-badge { grid-column: 1; grid-row: 1; font-size: 10px; }
     .event-main { grid-column: 1; grid-row: 2; }
     .event-speaker { display: none; }
-    .event-heart { align-self: center; font-size: 13px; grid-row: 1 / span 2; }
-    .event-chevron { align-self: center; padding-right: 4px; grid-row: 1 / span 2; }
+    .event-heart { grid-column: 2; grid-row: 1; align-self: center; font-size: 13px; }
+    .event-chevron { align-self: center; padding-right: 4px; grid-column: 3; grid-row: 1 / span 2; }
 
     .details-inner { padding: 0 8px 12px 8px; margin-left: 0; }
     .details-description { font-size: 14px; }
@@ -1109,8 +1109,6 @@ function renderEventList(events, tagIndex, selectedTypes, selectedTags) {
     chevron.className = 'event-chevron';
 
     row.appendChild(badge);
-    row.appendChild(main);
-    row.appendChild(speaker);
 
     if (favouriteIds.has(event.id)) {
       const slug = event.slug || (String(event.id) + '-' + (event.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''));
@@ -1125,6 +1123,8 @@ function renderEventList(events, tagIndex, selectedTypes, selectedTags) {
       row.appendChild(heart);
     }
 
+    row.appendChild(main);
+    row.appendChild(speaker);
     row.appendChild(chevron);
 
     // Details
