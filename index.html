@@ -1325,7 +1325,9 @@ function handleEventClick(id) {
         const rect = article.getBoundingClientRect();
         if (rect.bottom > window.innerHeight) {
           const HEADER = 60;
-          const scrollDelta = rect.top - HEADER;
+          const minScroll = rect.bottom - window.innerHeight + 16;
+          const maxScroll = rect.top - HEADER;
+          const scrollDelta = Math.min(minScroll, Math.max(maxScroll, 0));
           if (scrollDelta > 0) {
             const newScrollY = window.scrollY + scrollDelta;
             const overflow = newScrollY + window.innerHeight - document.documentElement.scrollHeight;
