@@ -1310,8 +1310,11 @@ function handleEventClick(id) {
   const article = document.querySelector('[data-id="' + id + '"]');
   if (!article) return;
   if (expandedIds.has(id)) {
+    const top = article.getBoundingClientRect().top;
     expandedIds.delete(id);
     article.classList.remove('expanded');
+    const delta = article.getBoundingClientRect().top - top;
+    if (delta !== 0) window.scrollBy({ top: delta, behavior: 'instant' });
   } else {
     expandedIds.add(id);
     article.classList.add('expanded');
