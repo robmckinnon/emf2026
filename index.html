@@ -1309,15 +1309,35 @@ function handleTagClick(tagName) {
 function handleEventClick(id) {
   const article = document.querySelector('[data-id="' + id + '"]');
   if (!article) return;
+  const eventList = document.getElementById('event-list');
   if (expandedIds.has(id)) {
     const top = article.getBoundingClientRect().top;
     expandedIds.delete(id);
     article.classList.remove('expanded');
     const delta = article.getBoundingClientRect().top - top;
     if (delta !== 0) window.scrollBy({ top: delta, behavior: 'instant' });
+    eventList.style.paddingBottom = '48px';
   } else {
     expandedIds.add(id);
     article.classList.add('expanded');
+    if (window.innerWidth > 599) {
+      requestAnimationFrame(() => {
+        const rect = article.getBoundingClientRect();
+        if (rect.bottom > window.innerHeight) {
+          const HEADER = 60;
+          const scrollDelta = rect.top - HEADER;
+          if (scrollDelta > 0) {
+            const newScrollY = window.scrollY + scrollDelta;
+            const overflow = newScrollY + window.innerHeight - document.documentElement.scrollHeight;
+            if (overflow > 0) {
+              eventList.style.paddingBottom = (overflow + 48) + 'px';
+              void document.documentElement.scrollHeight; // force reflow before scroll
+            }
+            window.scrollBy({ top: scrollDelta, behavior: 'instant' });
+          }
+        }
+      });
+    }
   }
 }
 
