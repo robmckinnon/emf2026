@@ -1135,10 +1135,9 @@ function renderEventList(events, tagIndex, selectedTypes, selectedTags) {
     row.appendChild(badge);
 
     if (favouriteIds.has(event.id)) {
-      const slug = event.slug || (String(event.id) + '-' + (event.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''));
       const heart = document.createElement('a');
       heart.className = 'event-heart';
-      heart.href = 'https://www.emfcamp.org/schedule/2026/' + slug + '#main-content';
+      heart.href = event.link;
       heart.target = '_blank';
       heart.rel = 'noopener noreferrer';
       heart.title = 'View on emfcamp.org';
