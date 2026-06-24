@@ -239,7 +239,7 @@
 
   /* Event list */
   #event-list {
-    padding-bottom: 48px;
+    padding-bottom: 40vh;
   }
 
   .event-article {
@@ -1316,7 +1316,7 @@ function handleEventClick(id) {
     article.classList.remove('expanded');
     const delta = article.getBoundingClientRect().top - top;
     if (delta !== 0) window.scrollBy({ top: delta, behavior: 'instant' });
-    eventList.style.paddingBottom = '48px';
+    eventList.style.paddingBottom = '';
   } else {
     expandedIds.add(id);
     article.classList.add('expanded');
