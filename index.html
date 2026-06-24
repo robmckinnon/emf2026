@@ -265,7 +265,7 @@
 
   .event-row {
     display: grid;
-    grid-template-columns: 120px 1fr auto auto;
+    grid-template-columns: 120px 1fr auto auto auto;
     align-items: start;
     gap: 12px;
     padding: 10px 0 10px 12px;
@@ -460,6 +460,80 @@
     pointer-events: none;
   }
 
+  .tag-pill.fave-active {
+    background: rgba(249,226,0,0.12);
+    color: var(--emf-yellow);
+    border-color: var(--emf-yellow);
+  }
+
+  .tag-pill.fave-active .count {
+    color: var(--emf-yellow);
+  }
+
+  /* Favourites help */
+  #fave-help {
+    padding: 6px 0 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  #fave-help-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    cursor: pointer;
+    user-select: none;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  #fave-help-toggle:hover { color: var(--emf-yellow); }
+
+  #fave-help-toggle::after {
+    content: '▸';
+    font-size: 9px;
+    transition: transform 120ms ease;
+  }
+
+  #fave-help.open #fave-help-toggle::after { transform: rotate(90deg); }
+
+  #fave-help-body {
+    display: none;
+    margin-top: 10px;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--text-2);
+    line-height: 1.7;
+  }
+
+  #fave-help.open #fave-help-body { display: block; }
+
+  .bookmarklet-link {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px dashed var(--emf-yellow);
+    background: rgba(249,226,0,0.08);
+    color: var(--emf-yellow);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    cursor: grab;
+  }
+
+  .bookmarklet-link:hover { background: rgba(249,226,0,0.15); }
+
   mark {
     background: rgba(247, 127, 2, 0.15);
     color: var(--text-2);
@@ -475,9 +549,59 @@
     padding: 0;
   }
 
+  /* Heart icon on favourited events */
+  .event-heart {
+    display: inline-flex;
+    align-items: center;
+    padding-top: 1px;
+    padding-right: 2px;
+    font-size: 15px;
+    color: var(--emf-coral);
+    opacity: 0.55;
+    text-decoration: none;
+    line-height: 1;
+    transition: opacity 120ms ease, transform 120ms ease;
+    flex-shrink: 0;
+  }
+
+  .event-heart:hover {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+
+  /* View Favourites toggle button */
+  #view-fave-btn {
+    display: none;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    user-select: none;
+    background: none;
+    border: 1px solid var(--emf-yellow);
+    border-radius: 4px;
+    padding: 3px 8px;
+    color: var(--emf-yellow);
+    opacity: 0.6;
+    transition: opacity 120ms ease, background 120ms ease;
+  }
+
+  #view-fave-btn:hover {
+    opacity: 1;
+    background: rgba(249,226,0,0.10);
+  }
+
+  #view-fave-btn.fave-active {
+    opacity: 1;
+    background: rgba(249,226,0,0.15);
+    border-color: var(--emf-yellow);
+  }
+
   /* Tablet: 600–899px */
   @media (min-width: 600px) and (max-width: 899px) {
-    .event-row { grid-template-columns: 100px 1fr auto auto; }
+    .event-row { grid-template-columns: 100px 1fr auto auto auto; }
     .details-inner { padding: 0 12px 14px 120px; margin-left: 0; }
   }
 
@@ -525,15 +649,16 @@
 
     .event-article { min-height: 44px; }
     .event-row {
-      grid-template-columns: 1fr auto;
+      grid-template-columns: 1fr auto auto;
       grid-template-rows: auto auto;
       padding: 10px 0 10px 8px;
-      gap: 4px 8px;
+      gap: 4px 6px;
     }
     .event-type-badge { grid-column: 1; grid-row: 1; font-size: 10px; }
     .event-main { grid-column: 1; grid-row: 2; }
     .event-speaker { display: none; }
-    .event-chevron { grid-column: 2; grid-row: 1 / span 2; align-self: center; padding-right: 4px; }
+    .event-heart { align-self: center; font-size: 13px; grid-row: 1 / span 2; }
+    .event-chevron { align-self: center; padding-right: 4px; grid-row: 1 / span 2; }
 
     .details-inner { padding: 0 8px 12px 8px; margin-left: 0; }
     .details-description { font-size: 14px; }
@@ -557,13 +682,31 @@
 <div class="container">
   <div class="filter-section" id="type-filter-section">
     <div class="section-label">Filter by type</div>
-    <div class="filter-section-body"><div id="type-cloud"></div></div>
+    <div class="filter-section-body">
+      <div id="favourites-bar" style="display:none;margin-bottom:6px"><button id="fave-btn" class="tag-pill"></button></div>
+      <div id="type-cloud"></div>
+    </div>
   </div>
 
   <section class="filter-section" id="tag-filter-section">
     <div class="section-label">Filter by Topic</div>
     <div class="filter-section-body"><div id="tag-cloud"></div></div>
   </section>
+
+  <div id="fave-help">
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <button id="fave-help-toggle">★ sync favourites</button>
+      <button id="view-fave-btn"></button>
+    </div>
+    <div id="fave-help-body">
+      <p style="margin-bottom:10px">
+        1. Drag
+        <a class="bookmarklet-link" href="javascript:(function(){fetch('https://www.emfcamp.org/schedule/2026.json',{credentials:'include'}).then(function(r){return r.json()}).then(function(d){var ids=d.filter(function(e){return e.is_fave}).map(function(e){return e.id});if(!ids.length){alert('No favourites found. Make sure you are logged in to emfcamp.org.');return;}location.href='https://robmckinnon.github.io/emf2026/?favourites='+ids.join(',');}).catch(function(){alert('Failed to fetch schedule. Make sure you are logged in to emfcamp.org.');})})();">★ EMF Favourites</a>
+        to your bookmarks bar.
+      </p>
+      <p>2. Go to <strong style="color:var(--text-1)">emfcamp.org</strong> while logged in, then click the bookmark — it will open this page filtered to your starred talks.</p>
+    </div>
+  </div>
 
   <div class="status-bar">
     <span class="status-text" id="status-text"></span>
@@ -635,10 +778,19 @@ const TAG_MAPPING = {
     "web": ["html","css","website","web page","webpage","javascript","http","web design","web development","frontend","front-end"],
 };
 
+// --- Favourites from URL ---
+const favouriteIds = (function() {
+  const params = new URLSearchParams(window.location.search);
+  const raw = params.get('favourites');
+  if (!raw) return new Set();
+  return new Set(raw.split(',').map(s => parseInt(s.trim(), 10)).filter(n => !isNaN(n)));
+})();
+
 // --- State ---
 let selectedTypes = new Set();
 let selectedTags = new Set();
 let expandedIds = new Set();
+let showFavouritesOnly = false;
 
 // --- Tag matching ---
 function escapeKeyword(kw) {
@@ -680,6 +832,7 @@ function buildTagCounts(tagIndex) {
 
 // --- Filtering helper ---
 function eventMatchesFilters(event, tagIndex, selectedTypes, selectedTags) {
+  if (showFavouritesOnly && !favouriteIds.has(event.id)) return false;
   if (selectedTypes.size > 0 && !selectedTypes.has(event.type)) return false;
   if (selectedTags.size > 0) {
     const tags = tagIndex.get(event.id) || [];
@@ -689,7 +842,7 @@ function eventMatchesFilters(event, tagIndex, selectedTypes, selectedTags) {
 }
 
 function computeDynamicCounts(events, tagIndex, selectedTypes, selectedTags) {
-  if (selectedTypes.size === 0 && selectedTags.size === 0) return tagCounts;
+  if (selectedTypes.size === 0 && selectedTags.size === 0 && !showFavouritesOnly) return tagCounts;
   const result = new Map();
   for (const tag of tagCounts.keys()) {
     if (selectedTags.has(tag)) {
@@ -879,7 +1032,7 @@ function renderEventList(events, tagIndex, selectedTypes, selectedTags) {
   const list = document.getElementById('event-list');
   list.innerHTML = '';
 
-  const filtered = (selectedTypes.size === 0 && selectedTags.size === 0)
+  const filtered = (selectedTypes.size === 0 && selectedTags.size === 0 && !showFavouritesOnly)
     ? [...events]
     : events.filter(e => eventMatchesFilters(e, tagIndex, selectedTypes, selectedTags));
 
@@ -958,6 +1111,20 @@ function renderEventList(events, tagIndex, selectedTypes, selectedTags) {
     row.appendChild(badge);
     row.appendChild(main);
     row.appendChild(speaker);
+
+    if (favouriteIds.has(event.id)) {
+      const slug = event.slug || (String(event.id) + '-' + (event.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''));
+      const heart = document.createElement('a');
+      heart.className = 'event-heart';
+      heart.href = 'https://www.emfcamp.org/schedule/2026/' + slug + '#main-content';
+      heart.target = '_blank';
+      heart.rel = 'noopener noreferrer';
+      heart.title = 'View on emfcamp.org';
+      heart.textContent = '♥';
+      heart.addEventListener('click', e => e.stopPropagation());
+      row.appendChild(heart);
+    }
+
     row.appendChild(chevron);
 
     // Details
@@ -1091,7 +1258,7 @@ function highlightKeywords(text, keywords) {
 
 function updateStatusBar() {
   const total = SCHEDULE_DATA.length;
-  const filtered = (selectedTypes.size === 0 && selectedTags.size === 0)
+  const filtered = (selectedTypes.size === 0 && selectedTags.size === 0 && !showFavouritesOnly)
     ? total
     : SCHEDULE_DATA.filter(e => eventMatchesFilters(e, tagIndex, selectedTypes, selectedTags)).length;
 
@@ -1099,7 +1266,7 @@ function updateStatusBar() {
   const clearBtn = document.getElementById('clear-btn');
 
   statusText.textContent = 'Showing ' + filtered + ' of ' + total + ' events';
-  clearBtn.style.display = (selectedTypes.size > 0 || selectedTags.size > 0) ? 'inline' : 'none';
+  clearBtn.style.display = (selectedTypes.size > 0 || selectedTags.size > 0 || showFavouritesOnly) ? 'inline' : 'none';
 }
 
 // --- Event handlers ---
@@ -1128,10 +1295,59 @@ function handleEventClick(id) {
   }
 }
 
+// --- Favourites button ---
+function renderFavouritesBtn() {
+  if (favouriteIds.size === 0) return;
+  const bar = document.getElementById('favourites-bar');
+  const btn = document.getElementById('fave-btn');
+  bar.style.display = 'block';
+  btn.className = 'tag-pill' + (showFavouritesOnly ? ' fave-active' : '');
+  btn.innerHTML = '';
+  const labelSpan = document.createElement('span');
+  labelSpan.textContent = '★ FAVOURITES';
+  const countSpan = document.createElement('span');
+  countSpan.className = 'count';
+  countSpan.textContent = '(' + favouriteIds.size + ')';
+  btn.appendChild(labelSpan);
+  btn.appendChild(countSpan);
+}
+
+// --- View Favourites button (next to sync toggle) ---
+function renderViewFaveBtn() {
+  const btn = document.getElementById('view-fave-btn');
+  if (favouriteIds.size === 0) {
+    btn.style.display = 'none';
+    return;
+  }
+  btn.style.display = 'inline-flex';
+  btn.textContent = '★ VIEW FAVOURITES (' + favouriteIds.size + ')';
+  btn.className = showFavouritesOnly ? 'fave-active' : '';
+}
+
+function handleFavouritesToggle() {
+  showFavouritesOnly = !showFavouritesOnly;
+  if (showFavouritesOnly) {
+    selectedTypes.clear();
+    selectedTags.clear();
+  }
+  renderFavouritesBtn();
+  renderViewFaveBtn();
+  renderTypeCloud(SCHEDULE_DATA, tagIndex, selectedTypes, selectedTags);
+  renderTagCloud(tagCounts, selectedTags);
+  renderEventList(SCHEDULE_DATA, tagIndex, selectedTypes, selectedTags);
+  updateStatusBar();
+}
+
+document.getElementById('fave-btn').addEventListener('click', handleFavouritesToggle);
+document.getElementById('view-fave-btn').addEventListener('click', handleFavouritesToggle);
+
 // --- Clear button ---
 document.getElementById('clear-btn').addEventListener('click', () => {
   selectedTypes.clear();
   selectedTags.clear();
+  showFavouritesOnly = false;
+  renderFavouritesBtn();
+  renderViewFaveBtn();
   renderTypeCloud(SCHEDULE_DATA, tagIndex, selectedTypes, selectedTags);
   renderTagCloud(tagCounts, selectedTags);
   renderEventList(SCHEDULE_DATA, tagIndex, selectedTypes, selectedTags);
@@ -1139,6 +1355,10 @@ document.getElementById('clear-btn').addEventListener('click', () => {
 });
 
 // --- Mobile collapse ---
+document.getElementById('fave-help-toggle').addEventListener('click', () => {
+  document.getElementById('fave-help').classList.toggle('open');
+});
+
 function initMobileCollapse() {
   if (window.matchMedia('(max-width: 599px)').matches) {
     const typeSection = document.getElementById('type-filter-section');
@@ -1180,6 +1400,8 @@ fetch('https://www.emfcamp.org/schedule/2026.json')
     SCHEDULE_DATA = data;
     tagIndex = buildTagIndex(SCHEDULE_DATA, TAG_MAPPING);
     tagCounts = buildTagCounts(tagIndex);
+    renderFavouritesBtn();
+    renderViewFaveBtn();
     renderTypeCloud(SCHEDULE_DATA, tagIndex, selectedTypes, selectedTags);
     renderTagCloud(tagCounts, selectedTags);
     renderEventList(SCHEDULE_DATA, tagIndex, selectedTypes, selectedTags);
@@ -1190,5 +1412,12 @@ fetch('https://www.emfcamp.org/schedule/2026.json')
     document.getElementById('event-list').innerHTML = '<p style="color:var(--text-3);padding:24px 0">> failed to load schedule_</p>';
   });
 </script>
+
+<!-- BOOKMARKLET
+Copy the javascript: URL below and save it as a bookmark in your browser.
+Visit https://www.emfcamp.org/ while logged in, then click the bookmark.
+
+javascript:(function(){fetch('https://www.emfcamp.org/schedule/2026.json',{credentials:'include'}).then(function(r){return r.json()}).then(function(d){var ids=d.filter(function(e){return e.is_fave}).map(function(e){return e.id});if(!ids.length){alert('No favourites found. Make sure you are logged in to emfcamp.org.');return;}location.href='https://robmckinnon.github.io/emf2026/?favourites='+ids.join(',');}).catch(function(){alert('Failed to fetch schedule. Make sure you are logged in to emfcamp.org.');})})();
+-->
 </body>
 </html>
