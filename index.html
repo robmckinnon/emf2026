@@ -129,16 +129,29 @@
     gap: 5px;
   }
 
-  #type-cloud {
+  .filter-section-body {
     flex: 1;
+    min-width: 0;
+  }
+
+  #type-cloud-row {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 5px;
+  }
+
+  #type-cloud {
+    display: flex;
+    flex-wrap: nowrap;
     gap: 5px;
   }
 
   #type-cloud .tag-pill {
-    min-width: 160px;
+    min-width: 0;
     justify-content: space-between;
+    white-space: nowrap;
+    padding: 6px 9px;
   }
 
   .tag-pill {
@@ -642,7 +655,8 @@
       padding-bottom: 0;
     }
 
-    #type-cloud { width: 100%; }
+    #type-cloud-row { flex-wrap: wrap; }
+    #type-cloud { width: 100%; flex-wrap: wrap; }
     #type-cloud .tag-pill { min-width: 0; flex: none; justify-content: flex-start; }
 
     .tag-pill { padding: 8px 10px; font-size: 11px; min-height: 36px; }
@@ -683,8 +697,10 @@
   <div class="filter-section" id="type-filter-section">
     <div class="section-label">Filter by type</div>
     <div class="filter-section-body">
-      <div id="favourites-bar" style="display:none;margin-bottom:6px"><button id="fave-btn" class="tag-pill"></button></div>
-      <div id="type-cloud"></div>
+      <div id="type-cloud-row">
+        <div id="favourites-bar" style="display:none"><button id="fave-btn" class="tag-pill"></button></div>
+        <div id="type-cloud"></div>
+      </div>
     </div>
   </div>
 
@@ -1036,9 +1052,17 @@ function renderEventList(events, tagIndex, selectedTypes, selectedTags) {
     ? [...events]
     : events.filter(e => eventMatchesFilters(e, tagIndex, selectedTypes, selectedTags));
 
-  filtered.sort((a, b) =>
-    stripEmoji(a.title).localeCompare(stripEmoji(b.title))
-  );
+  filtered.sort((a, b) => {
+    const aTitle = stripEmoji(a.title).trim();
+    const bTitle = stripEmoji(b.title).trim();
+    const isOpening = t => t === 'Opening Ceremony';
+    const isClosing = t => t === 'Closing Ceremony';
+    if (isOpening(aTitle) && !isOpening(bTitle)) return -1;
+    if (isOpening(bTitle) && !isOpening(aTitle)) return 1;
+    if (isClosing(aTitle) && !isClosing(bTitle)) return 1;
+    if (isClosing(bTitle) && !isClosing(aTitle)) return -1;
+    return aTitle.localeCompare(bTitle);
+  });
 
   if (filtered.length === 0) {
     const tagList = [...selectedTags].join(', ');
